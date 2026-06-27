@@ -1,0 +1,39 @@
+name: TRR Workflow
+
+# Trigger: runs whenever Excel files in the data/ folder are updated
+on:
+  push:
+    paths:
+      - "data/*.xlsx"
+
+jobs:
+  process:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout your repo
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: pip install pandas openpyxl
+
+      # Step 4: Run your transformation script
+      - name: Run transformation
+        run: python scripts/transform.py
+
+      # Step 5: Commit results back to repo
+      - name: Commit results
+        run: |
+          git config --global user.name "workflow-bot"
+          git config --global user.email "bot@example.com"
+          git add output/*.xlsx
+          git commit -m "Automated Excel transformation"
+          git push
